@@ -134,6 +134,11 @@ const Sidebar = ({ onToggle, activePath = '/' }: SidebarProps) => {
       href: '/douban?type=tv',
     },
     {
+      icon: Tv,
+      label: '短剧',
+      href: '/douban?type=duanju',
+    },
+    {
       icon: Clover,
       label: '综艺',
       href: '/douban?type=show',
