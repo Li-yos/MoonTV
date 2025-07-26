@@ -1,6 +1,6 @@
 'use client';
 
-import { Clover, Film, Home, Search, Tv } from 'lucide-react';
+import { Clover, Film, Home, Search, Tv, Tv-minimal-play } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -31,7 +31,7 @@ const MobileBottomNav = ({ activePath }: MobileBottomNavProps) => {
       href: '/douban?type=tv',
     },
     {
-      icon: Tv,
+      icon: Tv-minimal-play,
       label: '短剧',
       href: '/douban?type=duanju',
     },
