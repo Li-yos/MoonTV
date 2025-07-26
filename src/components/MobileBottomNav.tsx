@@ -1,6 +1,6 @@
 'use client';
 
-import { Clover, Film, Home, Search, Tv, Tv-minimal-play } from 'lucide-react';
+import { Clover, Film, Home, Search, Tv, tv-minimal-play } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
