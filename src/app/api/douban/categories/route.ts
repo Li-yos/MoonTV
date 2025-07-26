@@ -74,13 +74,6 @@ export async function GET(request: Request) {
     );
   }
 
-  if (!['tv', 'movie'].includes(kind)) {
-    return NextResponse.json(
-      { error: 'kind 参数必须是 tv 或 movie' },
-      { status: 400 }
-    );
-  }
-
   if (pageLimit < 1 || pageLimit > 100) {
     return NextResponse.json(
       { error: 'pageSize 必须在 1-100 之间' },
@@ -91,6 +84,54 @@ export async function GET(request: Request) {
   if (pageStart < 0) {
     return NextResponse.json(
       { error: 'pageStart 不能小于 0' },
+      { status: 400 }
+    );
+  }
+
+  // --- 新增的短剧逻辑 ---
+  if (kind === 'tv' && category === 'duanju') {
+    const wwzyApiUrl = `https://wwzy.tv/api.php/provide/vod?ac=videolist&pg=${(pageStart / pageLimit) + 1}&pagesize=${pageLimit}&t=1`; // 短剧分类ID为1
+    try {
+      const response = await fetch(wwzyApiUrl); // 直接使用fetch，因为这里是服务端
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      const wwzyData = await response.json();
+
+      // 转换旺旺短剧的数据格式为DoubanItem
+      const list: DoubanItem[] = wwzyData.list.map((item: any) => ({
+        id: item.vod_id.toString(),
+        title: item.vod_name,
+        poster: item.vod_pic,
+        rate: item.vod_score || '',
+        year: item.vod_year || '',
+      }));
+
+      const responseData: DoubanResult = {
+        code: 200,
+        message: '获取成功',
+        list: list,
+      };
+
+      const cacheTime = await getCacheTime();
+      return NextResponse.json(responseData, {
+        headers: {
+          'Cache-Control': `public, max-age=${cacheTime}`,
+        },
+      });
+    } catch (error) {
+      return NextResponse.json(
+        { error: '获取旺旺短剧数据失败', details: (error as Error).message },
+        { status: 500 }
+      );
+    }
+  }
+  // --- 新增的短剧逻辑结束 ---
+
+  // Original Douban API logic
+  if (!['tv', 'movie'].includes(kind)) {
+    return NextResponse.json(
+      { error: 'kind 参数必须是 tv 或 movie' },
       { status: 400 }
     );
   }
