@@ -36,6 +36,7 @@ function DoubanPageClient() {
     if (type === 'movie') return '全部';
     if (type === 'tv') return 'tv';
     if (type === 'show') return 'show';
+    if (type === 'duanju') return 'duanju';
     return '全部';
   });
 
@@ -67,6 +68,9 @@ function DoubanPageClient() {
     } else if (type === 'show') {
       setPrimarySelection('');
       setSecondarySelection('show');
+    } else if (type === 'duanju') {
+      setPrimarySelection('');
+      setSecondarySelection('duanju');
     } else {
       setPrimarySelection('');
       setSecondarySelection('全部');
@@ -86,8 +90,8 @@ function DoubanPageClient() {
   // 生成API请求参数的辅助函数
   const getRequestParams = useCallback(
     (pageStart: number) => {
-      // 当type为tv或show时，kind统一为'tv'，category使用type本身
-      if (type === 'tv' || type === 'show') {
+      // 当type为tv、show或duanju时，kind统一为'tv'，category使用type本身
+      if (type === 'tv' || type === 'show' || type === 'duanju') {
         return {
           kind: 'tv' as const,
           category: type,
@@ -248,7 +252,13 @@ function DoubanPageClient() {
 
   const getPageTitle = () => {
     // 根据 type 生成标题
-    return type === 'movie' ? '电影' : type === 'tv' ? '电视剧' : '综艺';
+    return type === 'movie'
+      ? '电影'
+      : type === 'tv'
+      ? '电视剧'
+      : type === 'show'
+      ? '综艺'
+      : '短剧';
   };
 
   const getActivePath = () => {
