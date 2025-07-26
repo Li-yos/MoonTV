@@ -85,6 +85,35 @@ export async function fetchDoubanCategories(
 ): Promise<DoubanResult> {
   const { kind, category, type, pageLimit = 20, pageStart = 0 } = params;
 
+  // 如果是短剧类型，则使用旺旺短剧的API
+  if (kind === 'tv' && category === 'duanju') {
+    const wwzyApiUrl = `https://wwzy.tv/api.php/provide/vod?ac=videolist&pg=${(pageStart / pageLimit) + 1}&pagesize=${pageLimit}&t=1`; // 短剧分类ID为1
+    try {
+      const response = await fetchWithTimeout(wwzyApiUrl);
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      const wwzyData = await response.json();
+
+      // 转换旺旺短剧的数据格式为DoubanItem
+      const list: DoubanItem[] = wwzyData.list.map((item: any) => ({
+        id: item.vod_id.toString(),
+        title: item.vod_name,
+        poster: item.vod_pic,
+        rate: item.vod_score || '',
+        year: item.vod_year || '',
+      }));
+
+      return {
+        code: 200,
+        message: '获取成功',
+        list: list,
+      };
+    } catch (error) {
+      throw new Error(`获取旺旺短剧数据失败: ${(error as Error).message}`);
+    }
+  }
+
   // 验证参数
   if (!['tv', 'movie'].includes(kind)) {
     throw new Error('kind 参数必须是 tv 或 movie');
